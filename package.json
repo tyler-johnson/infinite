@@ -20,12 +20,8 @@
 	},
 	"license": "MIT",
 	"keywords": [
-		"view",
-		"framework",
-		"DOM",
-		"html",
-		"binding",
-		"reactive",
-		"dependency"
+		"module",
+		"development",
+		"packages"
 	]
 }
