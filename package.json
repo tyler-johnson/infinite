@@ -7,7 +7,7 @@
 		"email": "tyler@beneaththeink.com",
 		"url": "http://github.com/tyler-johnson"
 	},
-	"main": "./lib/infinite",
+	"main": "./lib/index.js",
 	"bin": {
 		"inf": "bin/cmd.js"
 	},
