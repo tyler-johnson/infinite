@@ -4,15 +4,24 @@ var minimist = require("minimist"),
 	spawn = require("child_process").spawn;
 
 var argv = minimist(process.argv.slice(2), {
-	boolean: [ "version", "production" ],
-	alias: { v: "version", p: "production" },
+	boolean: [ "version", "help", "production" ],
+	alias: {
+		v: "version",
+		h: "help",
+		p: "production"
+	},
 	'--': true
 });
 
 if (argv.version) {
 	var pkg = require("../package.json");
 	console.log(pkg.name + " v" + pkg.version);
-	process.exit(0);
+	return process.exit(0);
+}
+
+if (argv._[0] == null || argv.help) {
+	console.log("Usage: inf <command> [options]");
+	return process.exit(0);
 }
 
 switch(argv._[0]) {
@@ -41,16 +50,14 @@ switch(argv._[0]) {
 
 	case "start":
 		require("../lib/pm.js").list().then(function(names) {
-			var expr = "process.argv = " + JSON.stringify(argv["--"]) + ";";
+			var expr = "process.argv = " + JSON.stringify(["inf","start"].concat(argv["--"])) + ";";
 			expr += "process.infinite = true;";
 
 			expr += names.map(function(n) {
-				return "require('" + n.replace(/'/g, "\\'") + "');"
+				return "require(\"" + n.replace(/"/g, "\\\"") + "\");"
 			}).join("");
 			
-			var runtime = spawn("node", [ "-e", expr ]);
-			runtime.stdout.pipe(process.stdout);
-			runtime.stderr.pipe(process.stderr);
+			spawn("node", [ "-e", expr ], { stdio: "inherit" });
 		});
 		break;
 
@@ -63,5 +70,9 @@ switch(argv._[0]) {
 			console.log("Installed dependencies in " + res[0].length + " packages.");
 			console.log("Symlinked " + res[1].length + " packages.");
 		});
+		break;
+
+	default:
+		console.error("Unknown command '" + argv._[0] + "'");
 		break;
 }
