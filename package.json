@@ -1,11 +1,18 @@
 {
 	"name": "infinite",
-	"version": "0.3.3",
+	"version": "0.3.4",
 	"description": "Module driven development utilities.",
 	"author": {
 		"name": "Tyler Johnson",
 		"email": "tyler@beneaththeink.com",
 		"url": "http://github.com/tyler-johnson"
+	},
+	"publishConfig": {
+		"registry": "http://registry.npmjs.org"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tyler-johnson/infinite.git"
 	},
 	"main": "./lib/index.js",
 	"bin": {

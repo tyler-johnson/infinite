@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+process.title = "inf";
+
 var minimist = require("minimist"),
 	spawn = require("child_process").spawn;
 
