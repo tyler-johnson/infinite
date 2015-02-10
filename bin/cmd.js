@@ -2,15 +2,21 @@
 
 process.title = "inf";
 
-var minimist = require("minimist"),
+var _ = require("underscore"),
+	minimist = require("minimist"),
 	spawn = require("child_process").spawn;
 
 var argv = minimist(process.argv.slice(2), {
-	boolean: [ "version", "help", "production" ],
+	string: [ "pkgdir" ],
+	boolean: [ "version", "help", "production", "save" ],
 	alias: {
 		v: "version",
 		h: "help",
-		p: "production"
+		p: "production",
+		d: "pkgdir"
+	},
+	default: {
+		pkgdir: "./packages"
 	},
 	'--': true
 });
@@ -28,49 +34,42 @@ if (argv._[0] == null || argv.help) {
 
 switch(argv._[0]) {
 	case "add":
-		require("../lib/pm.js").add(argv._.slice(1)).then(function(names) {
+		require("../lib/pm.js").add(".", argv._.slice(1), argv).then(function(res) {
+			var names = _.keys(res);
 			if (!names.length) return console.log("No packages added.");
 			console.log("Added " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
 			names.forEach(function(n) { console.log(n); });
 		});
 		break;
 
+	case "rm":
 	case "remove":
-		require("../lib/pm.js").remove(argv._.slice(1)).then(function(names) {
+		require("../lib/pm.js").remove(".", argv._.slice(1), argv).then(function(res) {
+			var names = _.keys(res);
 			if (!names.length) return console.log("No packages removed.");
 			console.log("Removed " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
 			names.forEach(function(n) { console.log(n); });
 		});
 		break;
 
+	case "ls":
 	case "list":
-		require("../lib/pm.js").list().then(function(names) {
-			if (!names.length) return console.log("No packages.");
-			names.forEach(function(n) { console.log(n); });
-		});
-		break;
-
-	case "start":
-		require("../lib/pm.js").list().then(function(names) {
-			var expr = "process.argv = " + JSON.stringify(["inf","start"].concat(argv["--"])) + ";";
-			expr += "process.infinite = true;";
-
-			expr += names.map(function(n) {
-				return "require(\"" + n.replace(/"/g, "\\\"") + "\");"
-			}).join("");
-			
-			spawn("node", [ "-e", expr ], { stdio: "inherit" });
+		require("../lib/pm.js").list(".", argv).then(function(names) {
+			if (!_.size(names)) return console.log("No packages.");
+			_.keys(names).forEach(function(n) { console.log(n); });
 		});
 		break;
 
 	case "install":
-		require("../lib/install.js")(argv._[1] || "./packages", {
+		require("../lib/install.js")(".", argv._.slice(1), _.extend({}, argv, {
 			npm: {
 				production: argv.production
 			}
-		}).then(function(res) {
-			console.log("Installed dependencies in " + res[0].length + " packages.");
-			console.log("Symlinked " + res[1].length + " packages.");
+		})).then(function(res) {
+			var names = _.keys(res);
+			if (!names.length) return console.log("No packages installed.");
+			console.log("Installed " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
+			names.forEach(function(n) { console.log(n); });
 		});
 		break;
 
