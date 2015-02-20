@@ -37,8 +37,9 @@ switch(argv._[0]) {
 		require("../lib/pm.js").add(".", argv._.slice(1), argv).then(function(res) {
 			var names = _.keys(res);
 			if (!names.length) return console.log("No packages added.");
-			console.log("Added " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log(n); });
+			console.log("\nAdded " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
+			names.forEach(function(n) { console.log("  + " + n); });
+			console.log();
 		});
 		break;
 
@@ -47,8 +48,9 @@ switch(argv._[0]) {
 		require("../lib/pm.js").remove(".", argv._.slice(1), argv).then(function(res) {
 			var names = _.keys(res);
 			if (!names.length) return console.log("No packages removed.");
-			console.log("Removed " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log(n); });
+			console.log("\nRemoved " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
+			names.forEach(function(n) { console.log("  - " + n); });
+			console.log();
 		});
 		break;
 
@@ -56,7 +58,9 @@ switch(argv._[0]) {
 	case "list":
 		require("../lib/pm.js").list(".", argv).then(function(names) {
 			if (!_.size(names)) return console.log("No packages.");
-			_.keys(names).forEach(function(n) { console.log(n); });
+			console.log("\nLinked Packages:");
+			_.keys(names).forEach(function(n) { console.log("  + " + n); });
+			console.log();
 		});
 		break;
 
@@ -68,8 +72,15 @@ switch(argv._[0]) {
 		})).then(function(res) {
 			var names = _.keys(res);
 			if (!names.length) return console.log("No packages installed.");
-			console.log("Installed " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log(n); });
+			console.log("\nInstalled " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
+			names.forEach(function(n) { console.log("  + " + n); });
+			console.log();
+		});
+		break;
+
+	case "clean":
+		require("../lib/clean.js")(".", _.extend({}, argv)).then(function(res) {
+			console.log("Safely removed all 'node_modules' directories.");
 		});
 		break;
 

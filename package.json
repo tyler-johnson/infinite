@@ -1,6 +1,6 @@
 {
 	"name": "infinite",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"description": "Module driven development utilities.",
 	"author": {
 		"name": "Tyler Johnson",
@@ -23,6 +23,7 @@
 		"minimist": "~1.1.0",
 		"mkdirp": "~0.5.0",
 		"npm": "~2.5.0",
+		"rimraf": "~2.2.8",
 		"underscore": "~1.7.0"
 	},
 	"license": "MIT",
