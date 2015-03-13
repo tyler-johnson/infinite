@@ -8,17 +8,13 @@ var _ = require("underscore"),
 	path = require("path");
 
 var argv = minimist(process.argv.slice(2), {
-	string: [ "pkgdir" ],
-	boolean: [ "version", "help", "production", "save" ],
+	string: [],
+	boolean: [ "version", "help", "save" ],
 	alias: {
 		v: "version",
-		h: "help",
-		p: "production",
-		d: "pkgdir"
+		h: "help"
 	},
-	default: {
-		pkgdir: "./packages"
-	},
+	default: {},
 	'--': true
 });
 
@@ -33,57 +29,50 @@ if (argv._[0] == null || argv.help) {
 	return process.exit(0);
 }
 
+function pkgdir(pkg) {
+	if (_.isArray(pkg)) return _.map(pkg, pkgdir);
+	return _.pick(pkg, "name", "__dirname");
+}
+
 switch(argv._[0]) {
 	case "add":
 		require("../lib/pm.js").add(".", argv._.slice(1), argv).then(function(res) {
-			var names = _.keys(res);
+			var names = pkgdir(res);
 			if (!names.length) return console.log("No packages added.");
-			console.log("\nAdded " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log("  + " + n); });
+			console.log("\n  Added " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
+			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
 			console.log();
 		});
 		break;
 
 	case "rm":
 	case "remove":
-		require("../lib/pm.js").remove(".", argv._.slice(1), argv).then(function(res) {
-			var names = _.keys(res);
+		require("../lib/pm.js").remove(".", argv._.slice(1), argv).then(function(names) {
 			if (!names.length) return console.log("No packages removed.");
-			console.log("\nRemoved " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log("  - " + n); });
+			console.log("\n  Removed " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
+			names.forEach(function(n) { console.log("    - %s", n); });
 			console.log();
 		});
 		break;
 
 	case "ls":
 	case "list":
-		require("../lib/pm.js").list(".", argv).then(function(names) {
+		require("../lib/pm.js").list(".", argv).then(function(res) {
+			var names = pkgdir(res);
 			if (!_.size(names)) return console.log("No packages.");
-			console.log("\nLinked Packages:");
-			_.keys(names).forEach(function(n) { console.log("  + " + n); });
+			console.log("\n  Packages:");
+			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
 			console.log();
 		});
 		break;
 
 	case "install":
-		require("../lib/install.js")(".", argv._.slice(1), _.extend({}, argv, {
-			npm: {
-				production: argv.production
-			}
-		})).then(function(res) {
-			var names = _.map(res, function(p) {
-				return _.pick(p, "name", "__dirname");
-			});
+		require("../lib/install.js")(".", argv._.slice(1), argv).then(function(res) {
+			var names = pkgdir(res);
 			if (!names.length) return console.log("No packages installed.");
-			console.log("\nInstalled " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log("  + %s (%s)", n.name, n.__dirname); });
+			console.log("\n  Installed " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
+			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
 			console.log();
-		});
-		break;
-
-	case "clean":
-		require("../lib/clean.js")(".", _.extend({}, argv)).then(function(res) {
-			console.log("Safely removed all 'node_modules' directories.");
 		});
 		break;
 
