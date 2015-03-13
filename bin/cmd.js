@@ -5,7 +5,8 @@ process.title = "inf";
 var _ = require("underscore"),
 	minimist = require("minimist"),
 	spawn = require("child_process").spawn,
-	path = require("path");
+	path = require("path"),
+	ipm = require("../lib/pm.js");
 
 var argv = minimist(process.argv.slice(2), {
 	string: [],
@@ -36,7 +37,7 @@ function pkgdir(pkg) {
 
 switch(argv._[0]) {
 	case "add":
-		require("../lib/pm.js").add(".", argv._.slice(1), argv).then(function(res) {
+		ipm.add(".", argv._.slice(1), argv).then(function(res) {
 			var names = pkgdir(res);
 			if (!names.length) return console.log("No packages added.");
 			console.log("\n  Added " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
@@ -47,7 +48,7 @@ switch(argv._[0]) {
 
 	case "rm":
 	case "remove":
-		require("../lib/pm.js").remove(".", argv._.slice(1), argv).then(function(names) {
+		ipm.remove(".", argv._.slice(1), argv).then(function(names) {
 			if (!names.length) return console.log("No packages removed.");
 			console.log("\n  Removed " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
 			names.forEach(function(n) { console.log("    - %s", n); });
@@ -57,10 +58,10 @@ switch(argv._[0]) {
 
 	case "ls":
 	case "list":
-		require("../lib/pm.js").list(".", argv).then(function(res) {
+		ipm.list(".", argv).then(function(res) {
 			var names = pkgdir(res);
 			if (!_.size(names)) return console.log("No packages.");
-			console.log("\n  Packages:");
+			console.log("\n  Packages (%s):", ipm.infFileName);
 			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
 			console.log();
 		});
