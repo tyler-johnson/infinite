@@ -9,13 +9,15 @@ var _ = require("underscore"),
 	ipm = require("../lib/pm.js");
 
 var argv = minimist(process.argv.slice(2), {
-	string: [],
-	boolean: [ "version", "help", "save" ],
+	string: [ "ignore" ],
+	boolean: [ "version", "help", "save", "npm", "sync" ],
 	alias: {
 		v: "version",
 		h: "help"
 	},
-	default: {},
+	default: {
+		"npm": true
+	},
 	'--': true
 });
 
@@ -74,6 +76,16 @@ switch(argv._[0]) {
 			console.log("\n  Installed " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
 			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
 			console.log();
+		});
+		break;
+
+	case "watch":
+		require("../lib/watch.js")(".", argv._.slice(1), argv).then(function(res) {
+			var names = pkgdir(res);
+			if (!names.length) return console.log("No packages installed.");
+			console.log("\n  Watching " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
+			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
+			console.log("\n  Ctrl-C to exit");
 		});
 		break;
 
