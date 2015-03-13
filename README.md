@@ -1,20 +1,21 @@
 # Infinite
 
-## Usage
+Copies a node module somewhere in your system into `node_modules/`. This is similar to `npm link`, but instead of symlinking the folder, it duplicates all of the contents.
 
+To install:
+
+```sh
+npm install infinite -g
 ```
-infinite( pkgdir [, options ][, callback ] ) -> Promise
+
+The following will copy the contents `~/some_pkg` to `./node_modules/some_pkg` and then runs `npm install` in that directory.
+
+```sh
+inf install ~/some_pkg
 ```
 
-Infinite is a function which accomplishes two tasks with a packages directory, `pkgdir`:
+Infinite will also continuously duplicate files as they change. Use in combination with `inf install` to get everything in the right place.
 
-1. Installs NPM dependencies in all immediate subdirectories with a `package.json` file.
-2. Symlinks all non-conflicting subdirectories into the `node_modules` folder.
-
-The `callback` is called when the process completes, possibly with an `error`. Infinite also returns a Promise that fulfills at the same time.
-
-These are valid properties for `options`:
-
-* `node_modules` - A path relative to `pkgdir` that points to a directory the packages should be symlinked into. This directory is created if it does not exist. Defaults to `../node_modules`.
-* `production` - This passes the `--production` flag to `npm install`, ensuring that no `devDependencies` are installed.
-* `loglevel` - This sets the [NPM log level](https://www.npmjs.org/doc/misc/npm-config.html#loglevel). Helpful if you are tired of those annoying NPM warnings.
+```sh
+inf watch ~/some_pkg
+```
