@@ -4,7 +4,8 @@ process.title = "inf";
 
 var _ = require("underscore"),
 	minimist = require("minimist"),
-	spawn = require("child_process").spawn;
+	spawn = require("child_process").spawn,
+	path = require("path");
 
 var argv = minimist(process.argv.slice(2), {
 	string: [ "pkgdir" ],
@@ -70,10 +71,12 @@ switch(argv._[0]) {
 				production: argv.production
 			}
 		})).then(function(res) {
-			var names = _.keys(res);
+			var names = _.map(res, function(p) {
+				return _.pick(p, "name", "__dirname");
+			});
 			if (!names.length) return console.log("No packages installed.");
 			console.log("\nInstalled " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log("  + " + n); });
+			names.forEach(function(n) { console.log("  + %s (%s)", n.name, n.__dirname); });
 			console.log();
 		});
 		break;
