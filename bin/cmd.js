@@ -8,15 +8,17 @@ var _ = require("underscore"),
 	path = require("path"),
 	ipm = require("../lib/pm.js");
 
+require("bluebird").longStackTraces();
+
 var argv = minimist(process.argv.slice(2), {
 	string: [ "ignore" ],
-	boolean: [ "version", "help", "save", "npm", "sync" ],
+	boolean: [ "version", "help", "save", "deps", "sync" ],
 	alias: {
 		v: "version",
 		h: "help"
 	},
 	default: {
-		"npm": true
+		"deps": true
 	},
 	'--': true
 });
@@ -85,7 +87,7 @@ switch(argv._[0]) {
 			if (!names.length) return console.log("No packages installed.");
 			console.log("\n  Watching " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
 			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
-			console.log("\n  Ctrl-C to exit");
+			console.log("\n  Ctrl-C to exit\n");
 		});
 		break;
 
