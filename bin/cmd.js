@@ -36,18 +36,12 @@ if (argv._[0] == null || argv.help) {
 
 var cwd = process.cwd();
 
-function pkgdir(pkg) {
-	if (_.isArray(pkg)) return _.map(pkg, pkgdir);
-	return _.pick(pkg, "name", "__dirname");
-}
-
 switch(argv._[0]) {
 	case "add":
-		ipm.add(cwd, argv._.slice(1), argv).then(function(res) {
-			var names = pkgdir(res);
+		ipm.add(cwd, argv._.slice(1), argv).then(function(names) {
 			if (!names.length) return console.log("No packages added.");
 			console.log("\n  Added " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
+			names.forEach(function(n) { console.log("    + %s@%s (%s)", n.name, n.version, n.__dirname); });
 			console.log();
 		});
 		break;
@@ -64,31 +58,28 @@ switch(argv._[0]) {
 
 	case "ls":
 	case "list":
-		ipm.list(cwd, argv).then(function(res) {
-			var names = pkgdir(res);
+		ipm.list(cwd, argv).then(function(names) {
 			if (!_.size(names)) return console.log("No packages.");
 			console.log("\n  Packages (%s):", ipm.infFileName);
-			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
+			names.forEach(function(n) { console.log("    + %s@%s (%s)", n.name, n.version, n.__dirname); });
 			console.log();
 		});
 		break;
 
 	case "install":
-		require("../lib/install.js")(cwd, argv._.slice(1), argv).then(function(res) {
-			var names = pkgdir(res);
+		require("../lib/install.js")(cwd, argv._.slice(1), argv).then(function(names) {
 			if (!names.length) return console.log("No packages installed.");
 			console.log("\n  Installed " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
+			names.forEach(function(n) { console.log("    + %s@%s (%s)", n.name, n.version, n.__dirname); });
 			console.log();
 		});
 		break;
 
 	case "watch":
-		require("../lib/watch.js")(cwd, argv._.slice(1), argv).then(function(res) {
-			var names = pkgdir(res);
+		require("../lib/watch.js")(cwd, argv._.slice(1), argv).then(function(names) {
 			if (!names.length) return console.log("No packages installed.");
 			console.log("\n  Watching " + names.length + " package" + (names.length === 1 ? "" : "s" ) + ":");
-			names.forEach(function(n) { console.log("    + %s (%s)", n.name, n.__dirname); });
+			names.forEach(function(n) { console.log("    + %s@%s (%s)", n.name, n.version, n.__dirname); });
 			console.log("\n  Ctrl-C to exit\n");
 		});
 		break;
